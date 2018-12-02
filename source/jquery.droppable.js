@@ -9,7 +9,7 @@
  */
 /**
  * droppable - EasyUI for jQuery
- * 
+ *
  */
 (function($){
 	function init(target){

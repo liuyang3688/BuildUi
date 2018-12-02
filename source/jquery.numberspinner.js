@@ -8,11 +8,11 @@
  *
  */
 (function ($) {
-    function create(jq) {
-        $(jq).addClass("numberspinner-f");
-        var options = $.data(jq, "numberspinner").options;
-        $(jq).numberbox($.extend({}, options, {doSize: false})).spinner(options);
-        $(jq).numberbox("setValue", options.value);
+    function create(target) {
+        $(target).addClass("numberspinner-f");
+        var opts = $.data(target, "numberspinner").options;
+        $(target).numberbox($.extend({}, opts, {doSize: false})).spinner(opts);
+        $(target).numberbox("setValue", opts.value);
     };
 
     function doSpin(target, down) {
@@ -36,9 +36,9 @@
         }
         options = options || {};
         return this.each(function () {
-            var ns = $.data(this, "numberspinner");
-            if (ns) {
-                $.extend(ns.options, options);
+            var state = $.data(this, "numberspinner");
+            if (state) {
+                $.extend(state.options, options);
             } else {
                 $.data(this, "numberspinner", {options: $.extend({}, $.fn.numberspinner.defaults, $.fn.numberspinner.parseOptions(this), options)});
             }
@@ -47,13 +47,13 @@
     };
     $.fn.numberspinner.methods = {
         options: function (jq) {
-            var nb = jq.numberbox("options");
+            var opts = jq.numberbox("options");
             return $.extend($.data(jq[0], "numberspinner").options, {
-                width: nb.width,
-                value: nb.value,
-                originalValue: nb.originalValue,
-                disabled: nb.disabled,
-                readonly: nb.readonly
+                width: opts.width,
+                value: opts.value,
+                originalValue: opts.originalValue,
+                disabled: opts.disabled,
+                readonly: opts.readonly
             });
         }
     };

@@ -8,20 +8,20 @@
  *
  */
 (function ($) {
-    function init(target) {
+    function create(target) {
         var opts = $.data(target, "timespinner").options;
         $(target).addClass("timespinner-f").spinner(opts);
-        var formatValue = opts.formatter.call(target, opts.parser.call(target, opts.value));
-        $(target).timespinner("initValue", formatValue);
+        var initValue = opts.formatter.call(target, opts.parser.call(target, opts.value));
+        $(target).timespinner("initValue", initValue);
     };
 
-    function click(e) {
+    function clickHandler(e) {
         var target = e.data.target;
         var opts = $.data(target, "timespinner").options;
-        var selectStart = $(target).timespinner("getSelectionStart");
+        var opts = $(target).timespinner("getSelectionStart");
         for (var i = 0; i < opts.selections.length; i++) {
-            var selection = opts.selections[i];
-            if (selectStart >= selection[0] && selectStart <= selection[1]) {
+            var range = opts.selections[i];
+            if (opts >= range[0] && opts <= range[1]) {
                 highlight(target, i);
                 return;
             }
@@ -33,10 +33,10 @@
         if (index != undefined) {
             opts.highlight = index;
         }
-        var selection = opts.selections[opts.highlight];
-        if (selection) {
+        var range = opts.selections[opts.highlight];
+        if (range) {
             var tb = $(target).timespinner("textbox");
-            $(target).timespinner("setSelectionRange", {start: selection[0], end: selection[1]});
+            $(target).timespinner("setSelectionRange", {start: range[0], end: range[1]});
             tb.focus();
         }
     };
@@ -44,17 +44,17 @@
     function setValue(target, value) {
         var opts = $.data(target, "timespinner").options;
         var value = opts.parser.call(target, value);
-        var formatValue = opts.formatter.call(target, value);
-        $(target).spinner("setValue", formatValue);
+        var text = opts.formatter.call(target, value);
+        $(target).spinner("setValue", text);
     };
 
     function doSpin(target, down) {
         var opts = $.data(target, "timespinner").options;
         var s = $(target).timespinner("getValue");
-        var selections = opts.selections[opts.highlight];
-        var s1 = s.substring(0, selections[0]);
-        var s2 = s.substring(selections[0], selections[1]);
-        var s3 = s.substring(selections[1]);
+        var range = opts.selections[opts.highlight];
+        var s1 = s.substring(0, range[0]);
+        var s2 = s.substring(range[0], range[1]);
+        var s3 = s.substring(range[1]);
         var v = s1 + ((parseInt(s2, 10) || 0) + opts.increment * (down ? -1 : 1)) + s3;
         $(target).timespinner("setValue", v);
         highlight(target);
@@ -70,24 +70,24 @@
         }
         options = options || {};
         return this.each(function () {
-            var timeSpinner = $.data(this, "timespinner");
-            if (timeSpinner) {
-                $.extend(timeSpinner.options, options);
+            var state = $.data(this, "timespinner");
+            if (state) {
+                $.extend(state.options, options);
             } else {
                 $.data(this, "timespinner", {options: $.extend({}, $.fn.timespinner.defaults, $.fn.timespinner.parseOptions(this), options)});
             }
-            init(this);
+            create(this);
         });
     };
     $.fn.timespinner.methods = {
         options: function (jq) {
-            var spinner = jq.data("spinner") ? jq.spinner("options") : {};
+            var opts = jq.data("spinner") ? jq.spinner("options") : {};
             return $.extend($.data(jq[0], "timespinner").options, {
-                width: spinner.width,
-                value: spinner.value,
-                originalValue: spinner.originalValue,
-                disabled: spinner.disabled,
-                readonly: spinner.readonly
+                width: opts.width,
+                value: opts.value,
+                originalValue: opts.originalValue,
+                disabled: opts.disabled,
+                readonly: opts.readonly
             });
         }, setValue: function (jq, value) {
             return jq.each(function () {
@@ -95,16 +95,16 @@
             });
         }, getHours: function (jq) {
             var opts = $.data(jq[0], "timespinner").options;
-            var value = opts.parser.call(jq[0], jq.timespinner("getValue"));
-            return value ? value.getHours() : null;
+            var vv = opts.parser.call(jq[0], jq.timespinner("getValue"));
+            return vv ? vv.getHours() : null;
         }, getMinutes: function (jq) {
             var opts = $.data(jq[0], "timespinner").options;
-            var value = opts.parser.call(jq[0], jq.timespinner("getValue"));
-            return value ? value.getMinutes() : null;
+            var vv = opts.parser.call(jq[0], jq.timespinner("getValue"));
+            return vv ? vv.getMinutes() : null;
         }, getSeconds: function (jq) {
             var opts = $.data(jq[0], "timespinner").options;
-            var value = opts.parser.call(jq[0], jq.timespinner("getValue"));
-            return value ? value.getSeconds() : null;
+            var vv = opts.parser.call(jq[0], jq.timespinner("getValue"));
+            return vv ? vv.getSeconds() : null;
         }
     };
     $.fn.timespinner.parseOptions = function (target) {
@@ -116,7 +116,7 @@
     $.fn.timespinner.defaults = $.extend({}, $.fn.spinner.defaults, {
         inputEvents: $.extend({}, $.fn.spinner.defaults.inputEvents, {
             click: function (e) {
-                click.call(this, e);
+                clickHandler.call(this, e);
             }, blur: function (e) {
                 var t = $(e.data.target);
                 t.timespinner("setValue", t.timespinner("getText"));
@@ -127,27 +127,27 @@
                 }
             }
         }),
-        formatter: function (value) {
-            if (!value) {
+        formatter: function (date) {
+            if (!date) {
                 return "";
             }
-            var timeSpinner = $(this).timespinner("options");
-            var tt = [padZero(value.getHours()), padZero(value.getMinutes())];
-            if (timeSpinner.showSeconds) {
-                tt.push(padZero(value.getSeconds()));
+            var opts = $(this).timespinner("options");
+            var tt = [formatN(date.getHours()), formatN(date.getMinutes())];
+            if (opts.showSeconds) {
+                tt.push(formatN(date.getSeconds()));
             }
-            return tt.join(timeSpinner.separator);
+            return tt.join(opts.separator);
 
-            function padZero(num) {
-                return (num < 10 ? "0" : "") + num;
+            function formatN(value) {
+                return (value < 10 ? "0" : "") + value;
             };
         },
         parser: function (s) {
-            var timeSpinner = $(this).timespinner("options");
-            var date = stringToDate(s);
+            var opts = $(this).timespinner("options");
+            var date = parseD(s);
             if (date) {
-                var min = stringToDate(timeSpinner.min);
-                var max = stringToDate(timeSpinner.max);
+                var min = parseD(opts.min);
+                var max = parseD(opts.max);
                 if (min && min > date) {
                     date = min;
                 }
@@ -156,12 +156,12 @@
                 }
             }
             return date;
-            
-            function stringToDate(s) {
+
+            function parseD(s) {
                 if (!s) {
                     return null;
                 }
-                var tt = s.split(timeSpinner.separator);
+                var tt = s.split(opts.separator);
                 return new Date(1900, 0, 0, parseInt(tt[0], 10) || 0, parseInt(tt[1], 10) || 0, parseInt(tt[2], 10) || 0);
             };
         },

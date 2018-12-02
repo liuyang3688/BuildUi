@@ -1,245 +1,289 @@
 /**
  * EasyUI for jQuery 1.6.10
- * 
+ *
  * Copyright (c) 2009-2018 www.jeasyui.com. All rights reserved.
  *
  * Licensed under the freeware license: http://www.jeasyui.com/license_freeware.php
  * To use it on other terms please contact us: info@jeasyui.com
  *
  */
-(function($){
-var _1=1;
-function _2(_3){
-$(_3).addClass("sidemenu");
-};
-function _4(_5,_6){
-var _7=$(_5).sidemenu("options");
-if(_6){
-$.extend(_7,{width:_6.width,height:_6.height});
-}
-$(_5)._size(_7);
-$(_5).find(".accordion").accordion("resize");
-};
-function _8(_9,_a,_b){
-var _c=$(_9).sidemenu("options");
-var tt=$("<ul class=\"sidemenu-tree\"></ul>").appendTo(_a);
-tt.tree({data:_b,animate:_c.animate,onBeforeSelect:function(_d){
-if(_d.children){
-return false;
-}
-},onSelect:function(_e){
-_12(_9,_e.id,true);
-},onExpand:function(_f){
-_25(_9,_f);
-},onCollapse:function(_10){
-_25(_9,_10);
-},onClick:function(_11){
-if(_11.children){
-if(_11.state=="open"){
-$(_11.target).addClass("tree-node-nonleaf-collapsed");
-}else{
-$(_11.target).removeClass("tree-node-nonleaf-collapsed");
-}
-$(this).tree("toggle",_11.target);
-}
-}});
-tt.unbind(".sidemenu").bind("mouseleave.sidemenu",function(){
-$(_a).trigger("mouseleave");
-});
-_12(_9,_c.selectedItemId);
-};
-function _13(_14,_15,_16){
-var _17=$(_14).sidemenu("options");
-$(_15).tooltip({content:$("<div></div>"),position:_17.floatMenuPosition,valign:"top",data:_16,onUpdate:function(_18){
-var _19=$(this).tooltip("options");
-var _1a=_19.data;
-_18.accordion({width:_17.floatMenuWidth,multiple:false}).accordion("add",{title:_1a.text,collapsed:false,collapsible:false});
-_8(_14,_18.accordion("panels")[0],_1a.children);
-},onShow:function(){
-var t=$(this);
-var tip=t.tooltip("tip").addClass("sidemenu-tooltip");
-tip.children(".tooltip-content").addClass("sidemenu");
-tip.find(".accordion").accordion("resize");
-tip.add(tip.find("ul.tree")).unbind(".sidemenu").bind("mouseover.sidemenu",function(){
-t.tooltip("show");
-}).bind("mouseleave.sidemenu",function(){
-t.tooltip("hide");
-});
-t.tooltip("reposition");
-},onPosition:function(_1b,top){
-var tip=$(this).tooltip("tip");
-if(!_17.collapsed){
-tip.css({left:-999999});
-}else{
-if(top+tip.outerHeight()>$(window)._outerHeight()+$(document).scrollTop()){
-top=$(window)._outerHeight()+$(document).scrollTop()-tip.outerHeight();
-tip.css("top",top);
-}
-}
-}});
-};
-function _1c(_1d,_1e){
-$(_1d).find(".sidemenu-tree").each(function(){
-_1e($(this));
-});
-$(_1d).find(".tooltip-f").each(function(){
-var tip=$(this).tooltip("tip");
-if(tip){
-tip.find(".sidemenu-tree").each(function(){
-_1e($(this));
-});
-$(this).tooltip("reposition");
-}
-});
-};
-function _12(_1f,_20,_21){
-var _22=null;
-var _23=$(_1f).sidemenu("options");
-_1c(_1f,function(t){
-t.find("div.tree-node-selected").removeClass("tree-node-selected");
-var _24=t.tree("find",_20);
-if(_24){
-$(_24.target).addClass("tree-node-selected");
-_23.selectedItemId=_24.id;
-t.trigger("mouseleave.sidemenu");
-_22=_24;
-}
-});
-if(_21&&_22){
-_23.onSelect.call(_1f,_22);
-}
-};
-function _25(_26,_27){
-_1c(_26,function(t){
-var _28=t.tree("find",_27.id);
-if(_28){
-var _29=t.tree("options");
-var _2a=_29.animate;
-_29.animate=false;
-t.tree(_27.state=="open"?"expand":"collapse",_28.target);
-_29.animate=_2a;
-}
-});
-};
-function _2b(_2c){
-var _2d=$(_2c).sidemenu("options");
-$(_2c).empty();
-if(_2d.data){
-$.easyui.forEach(_2d.data,true,function(_2e){
-if(!_2e.id){
-_2e.id="_easyui_sidemenu_"+(_1++);
-}
-if(!_2e.iconCls){
-_2e.iconCls="sidemenu-default-icon";
-}
-if(_2e.children){
-_2e.nodeCls="tree-node-nonleaf";
-if(!_2e.state){
-_2e.state="closed";
-}
-if(_2e.state=="open"){
-_2e.nodeCls="tree-node-nonleaf";
-}else{
-_2e.nodeCls="tree-node-nonleaf tree-node-nonleaf-collapsed";
-}
-}
-});
-var acc=$("<div></div>").appendTo(_2c);
-acc.accordion({fit:_2d.height=="auto"?false:true,border:_2d.border,multiple:_2d.multiple});
-var _2f=_2d.data;
-for(var i=0;i<_2f.length;i++){
-acc.accordion("add",{title:_2f[i].text,selected:_2f[i].state=="open",iconCls:_2f[i].iconCls,onBeforeExpand:function(){
-return !_2d.collapsed;
-}});
-var ap=acc.accordion("panels")[i];
-_8(_2c,ap,_2f[i].children);
-_13(_2c,ap.panel("header"),_2f[i]);
-}
-}
-};
-function _30(_31,_32){
-var _33=$(_31).sidemenu("options");
-_33.collapsed=_32;
-var acc=$(_31).find(".accordion");
-var _34=acc.accordion("panels");
-acc.accordion("options").animate=false;
-if(_33.collapsed){
-$(_31).addClass("sidemenu-collapsed");
-for(var i=0;i<_34.length;i++){
-var _35=_34[i];
-if(_35.panel("options").collapsed){
-_33.data[i].state="closed";
-}else{
-_33.data[i].state="open";
-acc.accordion("unselect",i);
-}
-var _36=_35.panel("header");
-_36.find(".panel-title").html("");
-_36.find(".panel-tool").hide();
-}
-}else{
-$(_31).removeClass("sidemenu-collapsed");
-for(var i=0;i<_34.length;i++){
-var _35=_34[i];
-if(_33.data[i].state=="open"){
-acc.accordion("select",i);
-}
-var _36=_35.panel("header");
-_36.find(".panel-title").html(_35.panel("options").title);
-_36.find(".panel-tool").show();
-}
-}
-acc.accordion("options").animate=_33.animate;
-};
-function _37(_38){
-$(_38).find(".tooltip-f").each(function(){
-$(this).tooltip("destroy");
-});
-$(_38).remove();
-};
-$.fn.sidemenu=function(_39,_3a){
-if(typeof _39=="string"){
-var _3b=$.fn.sidemenu.methods[_39];
-return _3b(this,_3a);
-}
-_39=_39||{};
-return this.each(function(){
-var _3c=$.data(this,"sidemenu");
-if(_3c){
-$.extend(_3c.options,_39);
-}else{
-_3c=$.data(this,"sidemenu",{options:$.extend({},$.fn.sidemenu.defaults,$.fn.sidemenu.parseOptions(this),_39)});
-_2(this);
-}
-_4(this);
-_2b(this);
-_30(this,_3c.options.collapsed);
-});
-};
-$.fn.sidemenu.methods={options:function(jq){
-return jq.data("sidemenu").options;
-},resize:function(jq,_3d){
-return jq.each(function(){
-_4(this,_3d);
-});
-},collapse:function(jq){
-return jq.each(function(){
-_30(this,true);
-});
-},expand:function(jq){
-return jq.each(function(){
-_30(this,false);
-});
-},destroy:function(jq){
-return jq.each(function(){
-_37(this);
-});
-}};
-$.fn.sidemenu.parseOptions=function(_3e){
-var t=$(_3e);
-return $.extend({},$.parser.parseOptions(_3e,["width","height"]));
-};
-$.fn.sidemenu.defaults={width:200,height:"auto",border:true,animate:true,multiple:true,collapsed:false,data:null,floatMenuWidth:200,floatMenuPosition:"right",onSelect:function(_3f){
-}};
+(function ($) {
+    var SIDEMENU_INDEX = 1;
+
+    function setStyle(target) {
+        $(target).addClass("sidemenu");
+    };
+
+    function resize(target, size) {
+        var opts = $(target).sidemenu("options");
+        if (size) {
+            $.extend(opts, {width: size.width, height: size.height});
+        }
+        $(target)._size(opts);
+        $(target).find(".accordion").accordion("resize");
+    };
+
+    function buildPanel(target, panel, data) {
+        var opts = $(target).sidemenu("options");
+        var tt = $("<ul class=\"sidemenu-tree\"></ul>").appendTo(panel);
+        tt.tree({
+            data: data, 
+            animate: opts.animate, 
+            onBeforeSelect: function (item) {
+                if (item.children) {
+                    return false;
+                }
+            }, onSelect: function (item) {
+                select(target, item.id, true);
+            }, onExpand: function (item) {
+                setExpandable(target, item);
+            }, onCollapse: function (item) {
+                setExpandable(target, item);
+            }, onClick: function (item) {
+                if (item.children) {
+                    if (item.state == "open") {
+                        $(item.target).addClass("tree-node-nonleaf-collapsed");
+                    } else {
+                        $(item.target).removeClass("tree-node-nonleaf-collapsed");
+                    }
+                    $(this).tree("toggle", item.target);
+                }
+            }
+        });
+        tt.unbind(".sidemenu").bind("mouseleave.sidemenu", function () {
+            $(panel).trigger("mouseleave");
+        });
+        select(target, opts.selectedItemId);
+    };
+
+    function buildHeader(target, header, data) {
+        var opts = $(target).sidemenu("options");
+        $(header).tooltip({
+            content: $("<div></div>"),
+            position: opts.floatMenuPosition,
+            valign: "top",
+            data: data,
+            onUpdate: function (acc) {
+                var opts = $(this).tooltip("options");
+                var data = opts.data;
+                acc.accordion({width: opts.floatMenuWidth, multiple: false}).accordion("add", {
+                    title: data.text,
+                    collapsed: false,
+                    collapsible: false
+                });
+                buildPanel(target, acc.accordion("panels")[0], data.children);
+            },
+            onShow: function () {
+                var t = $(this);
+                var tip = t.tooltip("tip").addClass("sidemenu-tooltip");
+                tip.children(".tooltip-content").addClass("sidemenu");
+                tip.find(".accordion").accordion("resize");
+                tip.add(tip.find("ul.tree")).unbind(".sidemenu").bind("mouseover.sidemenu", function () {
+                    t.tooltip("show");
+                }).bind("mouseleave.sidemenu", function () {
+                    t.tooltip("hide");
+                });
+                t.tooltip("reposition");
+            },
+            onPosition: function (param, top) {
+                var tip = $(this).tooltip("tip");
+                if (!opts.collapsed) {
+                    tip.css({left: -999999});
+                } else {
+                    if (top + tip.outerHeight() > $(window)._outerHeight() + $(document).scrollTop()) {
+                        top = $(window)._outerHeight() + $(document).scrollTop() - tip.outerHeight();
+                        tip.css("top", top);
+                    }
+                }
+            }
+        });
+    };
+
+    function setExpand(target, callback) {
+        $(target).find(".sidemenu-tree").each(function () {
+            callback($(this));
+        });
+        $(target).find(".tooltip-f").each(function () {
+            var tip = $(this).tooltip("tip");
+            if (tip) {
+                tip.find(".sidemenu-tree").each(function () {
+                    callback($(this));
+                });
+                $(this).tooltip("reposition");
+            }
+        });
+    };
+
+    function select(target, id, bParam) {
+        var curItem = null;
+        var opts = $(target).sidemenu("options");
+        setExpand(target, function (t) {
+            t.find("div.tree-node-selected").removeClass("tree-node-selected");
+            var item = t.tree("find", id);
+            if (item) {
+                $(item.target).addClass("tree-node-selected");
+                opts.selectedItemId = item.id;
+                t.trigger("mouseleave.sidemenu");
+                curItem = item;
+            }
+        });
+        if (bParam && curItem) {
+            opts.onSelect.call(target, curItem);
+        }
+    };
+
+    function setExpandable(target, item) {
+        setExpand(target, function (t) {
+            var treeitem = t.tree("find", item.id);
+            if (treeitem) {
+                var topts = t.tree("options");
+                var animated = topts.animate;
+                topts.animate = false;
+                t.tree(item.state == "open" ? "expand" : "collapse", treeitem.target);
+                topts.animate = animated;
+            }
+        });
+    };
+
+    function buildSideMenu(target) {
+        var opts = $(target).sidemenu("options");
+        $(target).empty();
+        if (opts.data) {
+            $.easyui.forEach(opts.data, true, function (item) {
+                if (!item.id) {
+                    item.id = "_easyui_sidemenu_" + (SIDEMENU_INDEX++);
+                }
+                if (!item.iconCls) {
+                    item.iconCls = "sidemenu-default-icon";
+                }
+                if (item.children) {
+                    item.nodeCls = "tree-node-nonleaf";
+                    if (!item.state) {
+                        item.state = "closed";
+                    }
+                    if (item.state == "open") {
+                        item.nodeCls = "tree-node-nonleaf";
+                    } else {
+                        item.nodeCls = "tree-node-nonleaf tree-node-nonleaf-collapsed";
+                    }
+                }
+            });
+            var acc = $("<div></div>").appendTo(target);
+            acc.accordion({fit: opts.height == "auto" ? false : true, border: opts.border, multiple: opts.multiple});
+            var data = opts.data;
+            for (var i = 0; i < data.length; i++) {
+                acc.accordion("add", {
+                    title: data[i].text,
+                    selected: data[i].state == "open",
+                    iconCls: data[i].iconCls,
+                    onBeforeExpand: function () {
+                        return !opts.collapsed;
+                    }
+                });
+                var ap = acc.accordion("panels")[i];
+                buildPanel(target, ap, data[i].children);
+                buildHeader(target, ap.panel("header"), data[i]);
+            }
+        }
+    };
+
+    function setCollapsed(target, collapsed) {
+        var opts = $(target).sidemenu("options");
+        opts.collapsed = collapsed;
+        var acc = $(target).find(".accordion");
+        var panels = acc.accordion("panels");
+        acc.accordion("options").animate = false;
+        if (opts.collapsed) {
+            $(target).addClass("sidemenu-collapsed");
+            for (var i = 0; i < panels.length; i++) {
+                var panel = panels[i];
+                if (panel.panel("options").collapsed) {
+                    opts.data[i].state = "closed";
+                } else {
+                    opts.data[i].state = "open";
+                    acc.accordion("unselect", i);
+                }
+                var header = panel.panel("header");
+                header.find(".panel-title").html("");
+                header.find(".panel-tool").hide();
+            }
+        } else {
+            $(target).removeClass("sidemenu-collapsed");
+            for (var i = 0; i < panels.length; i++) {
+                var panel = panels[i];
+                if (opts.data[i].state == "open") {
+                    acc.accordion("select", i);
+                }
+                var header = panel.panel("header");
+                header.find(".panel-title").html(panel.panel("options").title);
+                header.find(".panel-tool").show();
+            }
+        }
+        acc.accordion("options").animate = opts.animate;
+    };
+
+    function destroy(target) {
+        $(target).find(".tooltip-f").each(function () {
+            $(this).tooltip("destroy");
+        });
+        $(target).remove();
+    };
+    $.fn.sidemenu = function (options, param) {
+        if (typeof options == "string") {
+            var method = $.fn.sidemenu.methods[options];
+            return method(this, param);
+        }
+        options = options || {};
+        return this.each(function () {
+            var state = $.data(this, "sidemenu");
+            if (state) {
+                $.extend(state.options, options);
+            } else {
+                state = $.data(this, "sidemenu", {options: $.extend({}, $.fn.sidemenu.defaults, $.fn.sidemenu.parseOptions(this), options)});
+                setStyle(this);
+            }
+            resize(this);
+            buildSideMenu(this);
+            setCollapsed(this, state.options.collapsed);
+        });
+    };
+    $.fn.sidemenu.methods = {
+        options: function (jq) {
+            return jq.data("sidemenu").options;
+        }, resize: function (jq, size) {
+            return jq.each(function () {
+                resize(this, size);
+            });
+        }, collapse: function (jq) {
+            return jq.each(function () {
+                setCollapsed(this, true);
+            });
+        }, expand: function (jq) {
+            return jq.each(function () {
+                setCollapsed(this, false);
+            });
+        }, destroy: function (jq) {
+            return jq.each(function () {
+                destroy(this);
+            });
+        }
+    };
+    $.fn.sidemenu.parseOptions = function (target) {
+        var t = $(target);
+        return $.extend({}, $.parser.parseOptions(target, ["width", "height"]));
+    };
+    $.fn.sidemenu.defaults = {
+        width: 200,
+        height: "auto",
+        border: true,
+        animate: true,
+        multiple: true,
+        collapsed: false,
+        data: null,
+        floatMenuWidth: 200,
+        floatMenuPosition: "right",
+        onSelect: function (value) {
+        }
+    };
 })(jQuery);
 

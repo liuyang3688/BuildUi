@@ -8,16 +8,16 @@
  *
  */
 (function ($) {
-    function _1(_2) {
-        var _3 = $(_2).data("maskedbox");
-        var _4 = _3.options;
-        $(_2).textbox(_4);
-        $(_2).maskedbox("initValue", _4.value);
+    function _1(target) {
+        var state = $(target).data("maskedbox");
+        var opts = state.options;
+        $(target).textbox(opts);
+        $(target).maskedbox("initValue", opts.value);
     };
 
-    function _5(target, text) {
+    function _5(target, _7) {
         var opts = $(target).maskedbox("options");
-        var tt = (text || $(target).maskedbox("getText") || "").split("");
+        var tt = (_7 || $(target).maskedbox("getText") || "").split("");
         var vv = [];
         for (var i = 0; i < opts.mask.length; i++) {
             if (opts.masks[opts.mask[i]]) {
@@ -28,13 +28,13 @@
         return vv.join("");
     };
 
-    function _9(_a, _b) {
-        var _c = $(_a).maskedbox("options");
+    function _9(target, _b) {
+        var opts = $(target).maskedbox("options");
         var cc = _b.split("");
         var tt = [];
-        for (var i = 0; i < _c.mask.length; i++) {
-            var m = _c.mask[i];
-            var r = _c.masks[m];
+        for (var i = 0; i < opts.mask.length; i++) {
+            var m = opts.mask[i];
+            var r = opts.masks[m];
             if (r) {
                 var c = cc.shift();
                 if (c != undefined) {
@@ -44,7 +44,7 @@
                         continue;
                     }
                 }
-                tt.push(_c.promptChar);
+                tt.push(opts.promptChar);
             } else {
                 tt.push(m);
             }
@@ -52,96 +52,96 @@
         return tt.join("");
     };
 
-    function _d(_e, c) {
-        var _f = $(_e).maskedbox("options");
-        var _10 = $(_e).maskedbox("getSelectionRange");
-        var _11 = _12(_e, _10.start);
-        var end = _12(_e, _10.end);
-        if (_11 != -1) {
-            var r = new RegExp(_f.masks[_f.mask[_11]], "i");
+    function _d(target, c) {
+        var opts = $(target).maskedbox("options");
+        var range = $(target).maskedbox("getSelectionRange");
+        var start = _12(target, range.start);
+        var end = _12(target, range.end);
+        if (start != -1) {
+            var r = new RegExp(opts.masks[opts.mask[start]], "i");
             if (r.test(c)) {
-                var vv = _5(_e).split("");
-                var _13 = _11 - _14(_e, _11);
-                var _15 = end - _14(_e, end);
+                var vv = _5(target).split("");
+                var _13 = start - _14(target, start);
+                var _15 = end - _14(target, end);
                 vv.splice(_13, _15 - _13, c);
-                $(_e).maskedbox("setValue", _9(_e, vv.join("")));
-                _11 = _12(_e, ++_11);
-                $(_e).maskedbox("setSelectionRange", {start: _11, end: _11});
+                $(target).maskedbox("setValue", _9(target, vv.join("")));
+                start = _12(target, ++start);
+                $(target).maskedbox("setSelectionRange", {start: start, end: start});
             }
         }
     };
 
-    function _16(_17, _18) {
-        var _19 = $(_17).maskedbox("options");
-        var vv = _5(_17).split("");
-        var _1a = $(_17).maskedbox("getSelectionRange");
-        if (_1a.start == _1a.end) {
-            if (_18) {
-                var _1b = _1c(_17, _1a.start);
+    function del(target, isBack) {
+        var opts = $(target).maskedbox("options");
+        var vv = _5(target).split("");
+        var range = $(target).maskedbox("getSelectionRange");
+        if (range.start == range.end) {
+            if (isBack) {
+                var _1b = _1c(target, range.start);
             } else {
-                var _1b = _12(_17, _1a.start);
+                var _1b = _12(target, range.start);
             }
-            var _1d = _1b - _14(_17, _1b);
+            var _1d = _1b - _14(target, _1b);
             if (_1d >= 0) {
                 vv.splice(_1d, 1);
             }
         } else {
-            var _1b = _12(_17, _1a.start);
-            var end = _1c(_17, _1a.end);
-            var _1d = _1b - _14(_17, _1b);
-            var _1e = end - _14(_17, end);
+            var _1b = _12(target, range.start);
+            var end = _1c(target, range.end);
+            var _1d = _1b - _14(target, _1b);
+            var _1e = end - _14(target, end);
             vv.splice(_1d, _1e - _1d + 1);
         }
-        $(_17).maskedbox("setValue", _9(_17, vv.join("")));
-        $(_17).maskedbox("setSelectionRange", {start: _1b, end: _1b});
+        $(target).maskedbox("setValue", _9(target, vv.join("")));
+        $(target).maskedbox("setSelectionRange", {start: _1b, end: _1b});
     };
 
-    function _14(_1f, pos) {
-        var _20 = $(_1f).maskedbox("options");
-        var _21 = 0;
-        if (pos >= _20.mask.length) {
+    function _14(target, pos) {
+        var opts = $(target).maskedbox("options");
+        var index = 0;
+        if (pos >= opts.mask.length) {
             pos--;
         }
         for (var i = pos; i >= 0; i--) {
-            if (_20.masks[_20.mask[i]] == undefined) {
-                _21++;
+            if (opts.masks[opts.mask[i]] == undefined) {
+                index++;
             }
         }
-        return _21;
+        return index;
     };
 
-    function _12(_22, pos) {
-        var _23 = $(_22).maskedbox("options");
-        var m = _23.mask[pos];
-        var r = _23.masks[m];
-        while (pos < _23.mask.length && !r) {
+    function _12(target, pos) {
+        var opts = $(target).maskedbox("options");
+        var m = opts.mask[pos];
+        var r = opts.masks[m];
+        while (pos < opts.mask.length && !r) {
             pos++;
-            m = _23.mask[pos];
-            r = _23.masks[m];
+            m = opts.mask[pos];
+            r = opts.masks[m];
         }
         return pos;
     };
 
-    function _1c(_24, pos) {
-        var _25 = $(_24).maskedbox("options");
-        var m = _25.mask[--pos];
-        var r = _25.masks[m];
+    function _1c(target, pos) {
+        var opts = $(target).maskedbox("options");
+        var m = opts.mask[--pos];
+        var r = opts.masks[m];
         while (pos >= 0 && !r) {
             pos--;
-            m = _25.mask[pos];
-            r = _25.masks[m];
+            m = opts.mask[pos];
+            r = opts.masks[m];
         }
         return pos < 0 ? 0 : pos;
     };
 
-    function keydown(e) {
+    function doKeyDown(e) {
         if (e.metaKey || e.ctrlKey) {
             return;
         }
-        var _27 = e.data.target;
-        var _28 = $(_27).maskedbox("options");
-        var _29 = [9, 13, 35, 36, 37, 39];
-        if ($.inArray(e.keyCode, _29) != -1) {
+        var target = e.data.target;
+        var opts = $(target).maskedbox("options");
+        var keyCodes = [9, 13, 35, 36, 37, 39];
+        if ($.inArray(e.keyCode, keyCodes) != -1) {
             return true;
         }
         if (e.keyCode >= 96 && e.keyCode <= 105) {
@@ -164,12 +164,12 @@
             }
         }
         if (e.keyCode == 8) {
-            _16(_27, true);
+            del(target, true);
         } else {
             if (e.keyCode == 46) {
-                _16(_27, false);
+                del(target, false);
             } else {
-                _d(_27, c);
+                _d(target, c);
             }
         }
         return false;
@@ -177,46 +177,46 @@
     $.extend($.fn.textbox.methods, {
         inputMask: function (jq, _2a) {
             return jq.each(function () {
-                var _2b = this;
-                var _2c = $.extend({}, $.fn.maskedbox.defaults, _2a);
-                $.data(_2b, "maskedbox", {options: _2c});
-                var _2d = $(_2b).textbox("textbox");
-                _2d.unbind(".maskedbox");
-                for (var _2e in _2c.inputEvents) {
-                    _2d.bind(_2e + ".maskedbox", {target: _2b}, _2c.inputEvents[_2e]);
+                var target = this;
+                var opts = $.extend({}, $.fn.maskedbox.defaults, _2a);
+                $.data(target, "maskedbox", {options: opts});
+                var state = $(target).textbox("textbox");
+                state.unbind(".maskedbox");
+                for (var event in opts.inputEvents) {
+                    state.bind(event + ".maskedbox", {target: target}, opts.inputEvents[event]);
                 }
             });
         }
     });
-    $.fn.maskedbox = function (_2f, _30) {
-        if (typeof _2f == "string") {
-            var _31 = $.fn.maskedbox.methods[_2f];
-            if (_31) {
-                return _31(this, _30);
+    $.fn.maskedbox = function (options, param) {
+        if (typeof options == "string") {
+            var method = $.fn.maskedbox.methods[options];
+            if (method) {
+                return method(this, param);
             } else {
-                return this.textbox(_2f, _30);
+                return this.textbox(options, param);
             }
         }
-        _2f = _2f || {};
+        options = options || {};
         return this.each(function () {
-            var _32 = $.data(this, "maskedbox");
-            if (_32) {
-                $.extend(_32.options, _2f);
+            var state = $.data(this, "maskedbox");
+            if (state) {
+                $.extend(state.options, options);
             } else {
-                $.data(this, "maskedbox", {options: $.extend({}, $.fn.maskedbox.defaults, $.fn.maskedbox.parseOptions(this), _2f)});
+                $.data(this, "maskedbox", {options: $.extend({}, $.fn.maskedbox.defaults, $.fn.maskedbox.parseOptions(this), options)});
             }
             _1(this);
         });
     };
     $.fn.maskedbox.methods = {
         options: function (jq) {
-            var topts = jq.textbox("options");
+            var opts = jq.textbox("options");
             return $.extend($.data(jq[0], "maskedbox").options, {
-                width: topts.width,
-                value: topts.value,
-                originalValue: topts.originalValue,
-                disabled: topts.disabled,
-                readonly: topts.readonly
+                width: opts.width,
+                value: opts.value,
+                originalValue: opts.originalValue,
+                disabled: opts.disabled,
+                readonly: opts.readonly
             });
         }, initValue: function (jq, value) {
             return jq.each(function () {
@@ -238,7 +238,7 @@
         mask: "",
         promptChar: "_",
         masks: {"9": "[0-9]", "a": "[a-zA-Z]", "*": "[0-9a-zA-Z]"},
-        inputEvents: {keydown: keydown}
+        inputEvents: {keydown: doKeyDown}
     });
 })(jQuery);
 

@@ -9,24 +9,24 @@
  */
 (function ($) {
     function init(target) {
-        var options = $.data(target, "splitbutton").options;
-        $(target).menubutton(options);
+        var opts = $.data(target, "splitbutton").options;
+        $(target).menubutton(opts);
         $(target).addClass("s-btn");
     };
     $.fn.splitbutton = function (options, param) {
         if (typeof options == "string") {
-            var func = $.fn.splitbutton.methods[options];
-            if (func) {
-                return func(this, param);
+            var method = $.fn.splitbutton.methods[options];
+            if (method) {
+                return method(this, param);
             } else {
                 return this.menubutton(options, param);
             }
         }
         options = options || {};
         return this.each(function () {
-            var data = $.data(this, "splitbutton");
-            if (data) {
-                $.extend(data.options, options);
+            var state = $.data(this, "splitbutton");
+            if (state) {
+                $.extend(state.options, options);
             } else {
                 $.data(this, "splitbutton", {options: $.extend({}, $.fn.splitbutton.defaults, $.fn.splitbutton.parseOptions(this), options)});
                 $(this)._propAttr("disabled", false);
@@ -36,10 +36,10 @@
     };
     $.fn.splitbutton.methods = {
         options: function (jq) {
-            var mb = jq.menubutton("options");
-            var opts = $.data(jq[0], "splitbutton").options;
-            $.extend(opts, {disabled: mb.disabled, toggle: mb.toggle, selected: mb.selected});
-            return opts;
+            var mopts = jq.menubutton("options");
+            var sopts = $.data(jq[0], "splitbutton").options;
+            $.extend(sopts, {disabled: mopts.disabled, toggle: mopts.toggle, selected: mopts.selected});
+            return sopts;
         }
     };
     $.fn.splitbutton.parseOptions = function (target) {

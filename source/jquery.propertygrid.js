@@ -12,7 +12,7 @@
  * 
  * Dependencies:
  * 	 datagrid
- * 
+ *
  */
 (function($){
 	var currTarget;

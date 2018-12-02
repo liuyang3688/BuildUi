@@ -8,7 +8,7 @@
  *
  */
 (function ($) {
-    var count = 1;
+    var CHECKBOX_INDEX = 1;
 
     function buildCheckbox(target) {
         var checkbox = $("<span class=\"checkbox inputbox\">" + "<span class=\"checkbox-inner\">" + "<svg xml:space=\"preserve\" focusable=\"false\" version=\"1.1\" viewBox=\"0 0 24 24\"><path d=\"M4.1,12.7 9,17.6 20.3,6.3\" fill=\"none\" stroke=\"white\"></path></svg>" + "</span>" + "<input type=\"checkbox\" class=\"checkbox-value\">" + "</span>").insertAfter(target);
@@ -26,7 +26,7 @@
         var state = $.data(target, "checkbox");
         var opts = state.options;
         var checkbox = state.checkbox;
-        var id = "_easyui_checkbox_" + (++count);
+        var id = "_easyui_checkbox_" + (++CHECKBOX_INDEX);
         checkbox.find(".checkbox-value").attr("id", id);
         if (opts.label) {
             if (typeof opts.label == "object") {

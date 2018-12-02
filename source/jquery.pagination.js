@@ -1,296 +1,348 @@
 /**
  * EasyUI for jQuery 1.6.10
- * 
+ *
  * Copyright (c) 2009-2018 www.jeasyui.com. All rights reserved.
  *
  * Licensed under the freeware license: http://www.jeasyui.com/license_freeware.php
  * To use it on other terms please contact us: info@jeasyui.com
  *
  */
-(function($){
-function _1(_2){
-var _3=$.data(_2,"pagination");
-var _4=_3.options;
-var bb=_3.bb={};
-var _5=$(_2).addClass("pagination").html("<table cellspacing=\"0\" cellpadding=\"0\" border=\"0\"><tr></tr></table>");
-var tr=_5.find("tr");
-var aa=$.extend([],_4.layout);
-if(!_4.showPageList){
-_6(aa,"list");
-}
-if(!_4.showPageInfo){
-_6(aa,"info");
-}
-if(!_4.showRefresh){
-_6(aa,"refresh");
-}
-if(aa[0]=="sep"){
-aa.shift();
-}
-if(aa[aa.length-1]=="sep"){
-aa.pop();
-}
-for(var _7=0;_7<aa.length;_7++){
-var _8=aa[_7];
-if(_8=="list"){
-var ps=$("<select class=\"pagination-page-list\"></select>");
-ps.bind("change",function(){
-_4.pageSize=parseInt($(this).val());
-_4.onChangePageSize.call(_2,_4.pageSize);
-_10(_2,_4.pageNumber);
-});
-for(var i=0;i<_4.pageList.length;i++){
-$("<option></option>").text(_4.pageList[i]).appendTo(ps);
-}
-$("<td></td>").append(ps).appendTo(tr);
-}else{
-if(_8=="sep"){
-$("<td><div class=\"pagination-btn-separator\"></div></td>").appendTo(tr);
-}else{
-if(_8=="first"){
-bb.first=_9("first");
-}else{
-if(_8=="prev"){
-bb.prev=_9("prev");
-}else{
-if(_8=="next"){
-bb.next=_9("next");
-}else{
-if(_8=="last"){
-bb.last=_9("last");
-}else{
-if(_8=="manual"){
-$("<span style=\"padding-left:6px;\"></span>").html(_4.beforePageText).appendTo(tr).wrap("<td></td>");
-bb.num=$("<input class=\"pagination-num\" type=\"text\" value=\"1\" size=\"2\">").appendTo(tr).wrap("<td></td>");
-bb.num.unbind(".pagination").bind("keydown.pagination",function(e){
-if(e.keyCode==13){
-var _a=parseInt($(this).val())||1;
-_10(_2,_a);
-return false;
-}
-});
-bb.after=$("<span style=\"padding-right:6px;\"></span>").appendTo(tr).wrap("<td></td>");
-}else{
-if(_8=="refresh"){
-bb.refresh=_9("refresh");
-}else{
-if(_8=="links"){
-$("<td class=\"pagination-links\"></td>").appendTo(tr);
-}else{
-if(_8=="info"){
-if(_7==aa.length-1){
-$("<div class=\"pagination-info\"></div>").appendTo(_5);
-}else{
-$("<td><div class=\"pagination-info\"></div></td>").appendTo(tr);
-}
-}
-}
-}
-}
-}
-}
-}
-}
-}
-}
-}
-if(_4.buttons){
-$("<td><div class=\"pagination-btn-separator\"></div></td>").appendTo(tr);
-if($.isArray(_4.buttons)){
-for(var i=0;i<_4.buttons.length;i++){
-var _b=_4.buttons[i];
-if(_b=="-"){
-$("<td><div class=\"pagination-btn-separator\"></div></td>").appendTo(tr);
-}else{
-var td=$("<td></td>").appendTo(tr);
-var a=$("<a href=\"javascript:;\"></a>").appendTo(td);
-a[0].onclick=eval(_b.handler||function(){
-});
-a.linkbutton($.extend({},_b,{plain:true}));
-}
-}
-}else{
-var td=$("<td></td>").appendTo(tr);
-$(_4.buttons).appendTo(td).show();
-}
-}
-$("<div style=\"clear:both;\"></div>").appendTo(_5);
-function _9(_c){
-var _d=_4.nav[_c];
-var a=$("<a href=\"javascript:;\"></a>").appendTo(tr);
-a.wrap("<td></td>");
-a.linkbutton({iconCls:_d.iconCls,plain:true}).unbind(".pagination").bind("click.pagination",function(){
-_d.handler.call(_2);
-});
-return a;
-};
-function _6(aa,_e){
-var _f=$.inArray(_e,aa);
-if(_f>=0){
-aa.splice(_f,1);
-}
-return aa;
-};
-};
-function _10(_11,_12){
-var _13=$.data(_11,"pagination").options;
-_14(_11,{pageNumber:_12});
-_13.onSelectPage.call(_11,_13.pageNumber,_13.pageSize);
-};
-function _14(_15,_16){
-var _17=$.data(_15,"pagination");
-var _18=_17.options;
-var bb=_17.bb;
-$.extend(_18,_16||{});
-var ps=$(_15).find("select.pagination-page-list");
-if(ps.length){
-ps.val(_18.pageSize+"");
-_18.pageSize=parseInt(ps.val());
-}
-var _19=Math.ceil(_18.total/_18.pageSize)||1;
-if(_18.pageNumber<1){
-_18.pageNumber=1;
-}
-if(_18.pageNumber>_19){
-_18.pageNumber=_19;
-}
-if(_18.total==0){
-_18.pageNumber=0;
-_19=0;
-}
-if(bb.num){
-bb.num.val(_18.pageNumber);
-}
-if(bb.after){
-bb.after.html(_18.afterPageText.replace(/{pages}/,_19));
-}
-var td=$(_15).find("td.pagination-links");
-if(td.length){
-td.empty();
-var _1a=_18.pageNumber-Math.floor(_18.links/2);
-if(_1a<1){
-_1a=1;
-}
-var _1b=_1a+_18.links-1;
-if(_1b>_19){
-_1b=_19;
-}
-_1a=_1b-_18.links+1;
-if(_1a<1){
-_1a=1;
-}
-for(var i=_1a;i<=_1b;i++){
-var a=$("<a class=\"pagination-link\" href=\"javascript:;\"></a>").appendTo(td);
-a.linkbutton({plain:true,text:i});
-if(i==_18.pageNumber){
-a.linkbutton("select");
-}else{
-a.unbind(".pagination").bind("click.pagination",{pageNumber:i},function(e){
-_10(_15,e.data.pageNumber);
-});
-}
-}
-}
-var _1c=_18.displayMsg;
-_1c=_1c.replace(/{from}/,_18.total==0?0:_18.pageSize*(_18.pageNumber-1)+1);
-_1c=_1c.replace(/{to}/,Math.min(_18.pageSize*(_18.pageNumber),_18.total));
-_1c=_1c.replace(/{total}/,_18.total);
-$(_15).find("div.pagination-info").html(_1c);
-if(bb.first){
-bb.first.linkbutton({disabled:((!_18.total)||_18.pageNumber==1)});
-}
-if(bb.prev){
-bb.prev.linkbutton({disabled:((!_18.total)||_18.pageNumber==1)});
-}
-if(bb.next){
-bb.next.linkbutton({disabled:(_18.pageNumber==_19)});
-}
-if(bb.last){
-bb.last.linkbutton({disabled:(_18.pageNumber==_19)});
-}
-_1d(_15,_18.loading);
-};
-function _1d(_1e,_1f){
-var _20=$.data(_1e,"pagination");
-var _21=_20.options;
-_21.loading=_1f;
-if(_21.showRefresh&&_20.bb.refresh){
-_20.bb.refresh.linkbutton({iconCls:(_21.loading?"pagination-loading":"pagination-load")});
-}
-};
-$.fn.pagination=function(_22,_23){
-if(typeof _22=="string"){
-return $.fn.pagination.methods[_22](this,_23);
-}
-_22=_22||{};
-return this.each(function(){
-var _24;
-var _25=$.data(this,"pagination");
-if(_25){
-_24=$.extend(_25.options,_22);
-}else{
-_24=$.extend({},$.fn.pagination.defaults,$.fn.pagination.parseOptions(this),_22);
-$.data(this,"pagination",{options:_24});
-}
-_1(this);
-_14(this);
-});
-};
-$.fn.pagination.methods={options:function(jq){
-return $.data(jq[0],"pagination").options;
-},loading:function(jq){
-return jq.each(function(){
-_1d(this,true);
-});
-},loaded:function(jq){
-return jq.each(function(){
-_1d(this,false);
-});
-},refresh:function(jq,_26){
-return jq.each(function(){
-_14(this,_26);
-});
-},select:function(jq,_27){
-return jq.each(function(){
-_10(this,_27);
-});
-}};
-$.fn.pagination.parseOptions=function(_28){
-var t=$(_28);
-return $.extend({},$.parser.parseOptions(_28,[{total:"number",pageSize:"number",pageNumber:"number",links:"number"},{loading:"boolean",showPageList:"boolean",showPageInfo:"boolean",showRefresh:"boolean"}]),{pageList:(t.attr("pageList")?eval(t.attr("pageList")):undefined)});
-};
-$.fn.pagination.defaults={total:1,pageSize:10,pageNumber:1,pageList:[10,20,30,50],loading:false,buttons:null,showPageList:true,showPageInfo:true,showRefresh:true,links:10,layout:["list","sep","first","prev","sep","manual","sep","next","last","sep","refresh","info"],onSelectPage:function(_29,_2a){
-},onBeforeRefresh:function(_2b,_2c){
-},onRefresh:function(_2d,_2e){
-},onChangePageSize:function(_2f){
-},beforePageText:"Page",afterPageText:"of {pages}",displayMsg:"Displaying {from} to {to} of {total} items",nav:{first:{iconCls:"pagination-first",handler:function(){
-var _30=$(this).pagination("options");
-if(_30.pageNumber>1){
-$(this).pagination("select",1);
-}
-}},prev:{iconCls:"pagination-prev",handler:function(){
-var _31=$(this).pagination("options");
-if(_31.pageNumber>1){
-$(this).pagination("select",_31.pageNumber-1);
-}
-}},next:{iconCls:"pagination-next",handler:function(){
-var _32=$(this).pagination("options");
-var _33=Math.ceil(_32.total/_32.pageSize);
-if(_32.pageNumber<_33){
-$(this).pagination("select",_32.pageNumber+1);
-}
-}},last:{iconCls:"pagination-last",handler:function(){
-var _34=$(this).pagination("options");
-var _35=Math.ceil(_34.total/_34.pageSize);
-if(_34.pageNumber<_35){
-$(this).pagination("select",_35);
-}
-}},refresh:{iconCls:"pagination-refresh",handler:function(){
-var _36=$(this).pagination("options");
-if(_36.onBeforeRefresh.call(this,_36.pageNumber,_36.pageSize)!=false){
-$(this).pagination("select",_36.pageNumber);
-_36.onRefresh.call(this,_36.pageNumber,_36.pageSize);
-}
-}}}};
+(function ($) {
+    function buildToolbar(target) {
+        var state = $.data(target, "pagination");
+        var opts = state.options;
+        var bb = state.bb = {};
+        var pager = $(target).addClass("pagination").html("<table cellspacing=\"0\" cellpadding=\"0\" border=\"0\"><tr></tr></table>");
+        var tr = pager.find("tr");
+        var aa = $.extend([], opts.layout);
+        if (!opts.showPageList) {
+            removeArrayItem(aa, "list");
+        }
+        if (!opts.showPageInfo) {
+            removeArrayItem(aa, "info");
+        }
+        if (!opts.showRefresh) {
+            removeArrayItem(aa, "refresh");
+        }
+        if (aa[0] == "sep") {
+            aa.shift();
+        }
+        if (aa[aa.length - 1] == "sep") {
+            aa.pop();
+        }
+        for (var index = 0; index < aa.length; index++) {
+            var item = aa[index];
+            if (item == "list") {
+                var ps = $("<select class=\"pagination-page-list\"></select>");
+                ps.bind("change", function () {
+                    opts.pageSize = parseInt($(this).val());
+                    opts.onChangePageSize.call(target, opts.pageSize);
+                    selectPage(target, opts.pageNumber);
+                });
+                for (var i = 0; i < opts.pageList.length; i++) {
+                    $("<option></option>").text(opts.pageList[i]).appendTo(ps);
+                }
+                $("<td></td>").append(ps).appendTo(tr);
+            } else {
+                if (item == "sep") {
+                    $("<td><div class=\"pagination-btn-separator\"></div></td>").appendTo(tr);
+                } else {
+                    if (item == "first") {
+                        bb.first = createButton("first");
+                    } else {
+                        if (item == "prev") {
+                            bb.prev = createButton("prev");
+                        } else {
+                            if (item == "next") {
+                                bb.next = createButton("next");
+                            } else {
+                                if (item == "last") {
+                                    bb.last = createButton("last");
+                                } else {
+                                    if (item == "manual") {
+                                        $("<span style=\"padding-left:6px;\"></span>").html(opts.beforePageText).appendTo(tr).wrap("<td></td>");
+                                        bb.num = $("<input class=\"pagination-num\" type=\"text\" value=\"1\" size=\"2\">").appendTo(tr).wrap("<td></td>");
+                                        bb.num.unbind(".pagination").bind("keydown.pagination", function (e) {
+                                            if (e.keyCode == 13) {
+                                                var pageNumber = parseInt($(this).val()) || 1;
+                                                selectPage(target, pageNumber);
+                                                return false;
+                                            }
+                                        });
+                                        bb.after = $("<span style=\"padding-right:6px;\"></span>").appendTo(tr).wrap("<td></td>");
+                                    } else {
+                                        if (item == "refresh") {
+                                            bb.refresh = createButton("refresh");
+                                        } else {
+                                            if (item == "links") {
+                                                $("<td class=\"pagination-links\"></td>").appendTo(tr);
+                                            } else {
+                                                if (item == "info") {
+                                                    if (index == aa.length - 1) {
+                                                        $("<div class=\"pagination-info\"></div>").appendTo(pager);
+                                                    } else {
+                                                        $("<td><div class=\"pagination-info\"></div></td>").appendTo(tr);
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        if (opts.buttons) {
+            $("<td><div class=\"pagination-btn-separator\"></div></td>").appendTo(tr);
+            if ($.isArray(opts.buttons)) {
+                for (var i = 0; i < opts.buttons.length; i++) {
+                    var btn = opts.buttons[i];
+                    if (btn == "-") {
+                        $("<td><div class=\"pagination-btn-separator\"></div></td>").appendTo(tr);
+                    } else {
+                        var td = $("<td></td>").appendTo(tr);
+                        var a = $("<a href=\"javascript:;\"></a>").appendTo(td);
+                        a[0].onclick = eval(btn.handler || function () {
+                        });
+                        a.linkbutton($.extend({}, btn, {plain: true}));
+                    }
+                }
+            } else {
+                var td = $("<td></td>").appendTo(tr);
+                $(opts.buttons).appendTo(td).show();
+            }
+        }
+        $("<div style=\"clear:both;\"></div>").appendTo(pager);
+
+        function createButton(name) {
+            var btn = opts.nav[name];
+            var a = $("<a href=\"javascript:;\"></a>").appendTo(tr);
+            a.wrap("<td></td>");
+            a.linkbutton({
+                iconCls: btn.iconCls,
+                plain: true
+            }).unbind(".pagination").bind("click.pagination", function () {
+                btn.handler.call(target);
+            });
+            return a;
+        };
+
+        function removeArrayItem(aa, item) {
+            var index = $.inArray(item, aa);
+            if (index >= 0) {
+                aa.splice(index, 1);
+            }
+            return aa;
+        };
+    };
+
+    function selectPage(target, page) {
+        var opts = $.data(target, "pagination").options;
+        refreshData(target, {pageNumber: page});
+        opts.onSelectPage.call(target, opts.pageNumber, opts.pageSize);
+    };
+
+    function refreshData(target, page) {
+        var state = $.data(target, "pagination");
+        var opts = state.options;
+        var bb = state.bb;
+        $.extend(opts, page || {});
+        var ps = $(target).find("select.pagination-page-list");
+        if (ps.length) {
+            ps.val(opts.pageSize + "");
+            opts.pageSize = parseInt(ps.val());
+        }
+        var pageCount = Math.ceil(opts.total / opts.pageSize) || 1;
+        if (opts.pageNumber < 1) {
+            opts.pageNumber = 1;
+        }
+        if (opts.pageNumber > pageCount) {
+            opts.pageNumber = pageCount;
+        }
+        if (opts.total == 0) {
+            opts.pageNumber = 0;
+            pageCount = 0;
+        }
+        if (bb.num) {
+            bb.num.val(opts.pageNumber);
+        }
+        if (bb.after) {
+            bb.after.html(opts.afterPageText.replace(/{pages}/, pageCount));
+        }
+        var td = $(target).find("td.pagination-links");
+        if (td.length) {
+            td.empty();
+            var listBegin = opts.pageNumber - Math.floor(opts.links / 2);
+            if (listBegin < 1) {
+                listBegin = 1;
+            }
+            var listEnd = listBegin + opts.links - 1;
+            if (listEnd > pageCount) {
+                listEnd = pageCount;
+            }
+            listBegin = listEnd - opts.links + 1;
+            if (listBegin < 1) {
+                listBegin = 1;
+            }
+            for (var i = listBegin; i <= listEnd; i++) {
+                var a = $("<a class=\"pagination-link\" href=\"javascript:;\"></a>").appendTo(td);
+                a.linkbutton({plain: true, text: i});
+                if (i == opts.pageNumber) {
+                    a.linkbutton("select");
+                } else {
+                    a.unbind(".pagination").bind("click.pagination", {pageNumber: i}, function (e) {
+                        selectPage(target, e.data.pageNumber);
+                    });
+                }
+            }
+        }
+        var pinfo = opts.displayMsg;
+        pinfo = pinfo.replace(/{from}/, opts.total == 0 ? 0 : opts.pageSize * (opts.pageNumber - 1) + 1);
+        pinfo = pinfo.replace(/{to}/, Math.min(opts.pageSize * (opts.pageNumber), opts.total));
+        pinfo = pinfo.replace(/{total}/, opts.total);
+        $(target).find("div.pagination-info").html(pinfo);
+        if (bb.first) {
+            bb.first.linkbutton({disabled: ((!opts.total) || opts.pageNumber == 1)});
+        }
+        if (bb.prev) {
+            bb.prev.linkbutton({disabled: ((!opts.total) || opts.pageNumber == 1)});
+        }
+        if (bb.next) {
+            bb.next.linkbutton({disabled: (opts.pageNumber == pageCount)});
+        }
+        if (bb.last) {
+            bb.last.linkbutton({disabled: (opts.pageNumber == pageCount)});
+        }
+        setLoadStatus(target, opts.loading);
+    };
+
+    function setLoadStatus(target, loading) {
+        var state = $.data(target, "pagination");
+        var opts = state.options;
+        opts.loading = loading;
+        if (opts.showRefresh && state.bb.refresh) {
+            state.bb.refresh.linkbutton({iconCls: (opts.loading ? "pagination-loading" : "pagination-load")});
+        }
+    };
+    $.fn.pagination = function (options, param) {
+        if (typeof options == "string") {
+            return $.fn.pagination.methods[options](this, param);
+        }
+        options = options || {};
+        return this.each(function () {
+            var opts;
+            var state = $.data(this, "pagination");
+            if (state) {
+                opts = $.extend(state.options, options);
+            } else {
+                opts = $.extend({}, $.fn.pagination.defaults, $.fn.pagination.parseOptions(this), options);
+                $.data(this, "pagination", {options: opts});
+            }
+            buildToolbar(this);
+            refreshData(this);
+        });
+    };
+    $.fn.pagination.methods = {
+        options: function (jq) {
+            return $.data(jq[0], "pagination").options;
+        }, loading: function (jq) {
+            return jq.each(function () {
+                setLoadStatus(this, true);
+            });
+        }, loaded: function (jq) {
+            return jq.each(function () {
+                setLoadStatus(this, false);
+            });
+        }, refresh: function (jq, options) {
+            return jq.each(function () {
+                refreshData(this, options);
+            });
+        }, select: function (jq, page) {
+            return jq.each(function () {
+                selectPage(this, page);
+            });
+        }
+    };
+    $.fn.pagination.parseOptions = function (target) {
+        var t = $(target);
+        return $.extend({}, $.parser.parseOptions(target, [{
+            total: "number",
+            pageSize: "number",
+            pageNumber: "number",
+            links: "number"
+        }, {
+            loading: "boolean",
+            showPageList: "boolean",
+            showPageInfo: "boolean",
+            showRefresh: "boolean"
+        }]), {pageList: (t.attr("pageList") ? eval(t.attr("pageList")) : undefined)});
+    };
+    $.fn.pagination.defaults = {
+        total: 1,
+        pageSize: 10,
+        pageNumber: 1,
+        pageList: [10, 20, 30, 50],
+        loading: false,
+        buttons: null,
+        showPageList: true,
+        showPageInfo: true,
+        showRefresh: true,
+        links: 10,
+        layout: ["list", "sep", "first", "prev", "sep", "manual", "sep", "next", "last", "sep", "refresh", "info"],
+        onSelectPage: function (pageNumber, pageSize) {
+        },
+        onBeforeRefresh: function (pageNumber, pageSize) {
+        },
+        onRefresh: function (pageNumber, pageSize) {
+        },
+        onChangePageSize: function (pageSize) {
+        },
+        beforePageText: "Page",
+        afterPageText: "of {pages}",
+        displayMsg: "Displaying {from} to {to} of {total} items",
+        nav: {
+            first: {
+                iconCls: "pagination-first", handler: function () {
+                    var opts = $(this).pagination("options");
+                    if (opts.pageNumber > 1) {
+                        $(this).pagination("select", 1);
+                    }
+                }
+            }, prev: {
+                iconCls: "pagination-prev", handler: function () {
+                    var opts = $(this).pagination("options");
+                    if (opts.pageNumber > 1) {
+                        $(this).pagination("select", opts.pageNumber - 1);
+                    }
+                }
+            }, next: {
+                iconCls: "pagination-next", handler: function () {
+                    var opts = $(this).pagination("options");
+                    var pageCount = Math.ceil(opts.total / opts.pageSize);
+                    if (opts.pageNumber < pageCount) {
+                        $(this).pagination("select", opts.pageNumber + 1);
+                    }
+                }
+            }, last: {
+                iconCls: "pagination-last", handler: function () {
+                    var opts = $(this).pagination("options");
+                    var pageCount = Math.ceil(opts.total / opts.pageSize);
+                    if (opts.pageNumber < pageCount) {
+                        $(this).pagination("select", pageCount);
+                    }
+                }
+            }, refresh: {
+                iconCls: "pagination-refresh", handler: function () {
+                    var opts = $(this).pagination("options");
+                    if (opts.onBeforeRefresh.call(this, opts.pageNumber, opts.pageSize) != false) {
+                        $(this).pagination("select", opts.pageNumber);
+                        opts.onRefresh.call(this, opts.pageNumber, opts.pageSize);
+                    }
+                }
+            }
+        }
+    };
 })(jQuery);
 

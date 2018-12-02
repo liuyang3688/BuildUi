@@ -8,24 +8,24 @@
  *
  */
 (function ($) {
-    function init(target) {
-        var spinner = $.data(target, "spinner");
-        var opts = spinner.options;
-        var iconArray = $.extend(true, [], opts.icons);
+    function buildSpinner(target) {
+        var state = $.data(target, "spinner");
+        var opts = state.options;
+        var icons = $.extend(true, [], opts.icons);
         if (opts.spinAlign == "left" || opts.spinAlign == "right") {
             opts.spinArrow = true;
             opts.iconAlign = opts.spinAlign;
-            var config = {
+            var arrow = {
                 iconCls: "spinner-button-updown", 
                 handler: function (e) {
-                    var closest = $(e.target).closest(".spinner-arrow-up,.spinner-arrow-down");
-                    doSpin(e.data.target, closest.hasClass("spinner-arrow-down"));
+                    var spin = $(e.target).closest(".spinner-arrow-up,.spinner-arrow-down");
+                    doSpin(e.data.target, spin.hasClass("spinner-arrow-down"));
                 }
             };
             if (opts.spinAlign == "left") {
-                iconArray.unshift(config);
+                icons.unshift(arrow);
             } else {
-                iconArray.push(config);
+                icons.push(arrow);
             }
         } else {
             opts.spinArrow = false;
@@ -41,50 +41,50 @@
             }
         }
         $(target).addClass("spinner-f").textbox($.extend({}, opts, {
-            icons: iconArray, 
-            doSize: false, 
-            onResize: function (param1, param2) {
+            icons: icons,
+            doSize: false,
+            onResize: function (width, height) {
                 if (!opts.spinArrow) {
-                    var next = $(this).next();
-                    var tb = next.find(".textbox-button:not(.spinner-button)");
-                    if (tb.length) {
-                        var oWidth = tb.outerWidth();
-                        var oHeight = tb.outerHeight();
-                        var leftBtn = next.find(".spinner-button." + opts.clsLeft);
-                        var rightBtn = next.find(".spinner-button." + opts.clsRight);
+                    var span = $(this).next();
+                    var btn = span.find(".textbox-button:not(.spinner-button)");
+                    if (btn.length) {
+                        var btnWidth = btn.outerWidth();
+                        var btnHeight = btn.outerHeight();
+                        var btnLeft = span.find(".spinner-button." + opts.clsLeft);
+                        var btnRight = span.find(".spinner-button." + opts.clsRight);
                         if (opts.buttonAlign == "right") {
-                            rightBtn.css("marginRight", oWidth + "px");
+                            btnRight.css("marginRight", btnWidth + "px");
                         } else {
                             if (opts.buttonAlign == "left") {
-                                leftBtn.css("marginLeft", oWidth + "px");
+                                btnLeft.css("marginLeft", btnWidth + "px");
                             } else {
                                 if (opts.buttonAlign == "top") {
-                                    rightBtn.css("marginTop", oHeight + "px");
+                                    btnRight.css("marginTop", btnHeight + "px");
                                 } else {
-                                    leftBtn.css("marginBottom", oHeight + "px");
+                                    btnLeft.css("marginBottom", btnHeight + "px");
                                 }
                             }
                         }
                     }
                 }
-                opts.onResize.call(this, param1, param2);
+                opts.onResize.call(this, width, height);
             }
         }));
         $(target).attr("spinnerName", $(target).attr("textboxName"));
-        spinner.spinner = $(target).next();
-        spinner.spinner.addClass("spinner");
+        state.spinner = $(target).next();
+        state.spinner.addClass("spinner");
         if (opts.spinArrow) {
-            var btn = spinner.spinner.find(".spinner-button-updown");
-            btn.append("<span class=\"spinner-arrow spinner-button-top\">" + "<span class=\"spinner-arrow-up\"></span>" + "</span>" + "<span class=\"spinner-arrow spinner-button-bottom\">" + "<span class=\"spinner-arrow-down\"></span>" + "</span>");
+            var arrowIcon = state.spinner.find(".spinner-button-updown");
+            arrowIcon.append("<span class=\"spinner-arrow spinner-button-top\">" + "<span class=\"spinner-arrow-up\"></span>" + "</span>" + "<span class=\"spinner-arrow spinner-button-bottom\">" + "<span class=\"spinner-arrow-down\"></span>" + "</span>");
         } else {
-            var leftBtn = $("<a href=\"javascript:;\" class=\"textbox-button spinner-button\"></a>").addClass(opts.clsLeft).appendTo(spinner.spinner);
-            var rightBtn = $("<a href=\"javascript:;\" class=\"textbox-button spinner-button\"></a>").addClass(opts.clsRight).appendTo(spinner.spinner);
-            leftBtn.linkbutton({
+            var btnLeft = $("<a href=\"javascript:;\" class=\"textbox-button spinner-button\"></a>").addClass(opts.clsLeft).appendTo(state.spinner);
+            var btnRight = $("<a href=\"javascript:;\" class=\"textbox-button spinner-button\"></a>").addClass(opts.clsRight).appendTo(state.spinner);
+            btnLeft.linkbutton({
                 iconCls: opts.reversed ? "spinner-button-up" : "spinner-button-down", onClick: function () {
                     doSpin(target, !opts.reversed);
                 }
             });
-            rightBtn.linkbutton({
+            btnRight.linkbutton({
                 iconCls: opts.reversed ? "spinner-button-down" : "spinner-button-up", onClick: function () {
                     doSpin(target, opts.reversed);
                 }
@@ -100,9 +100,9 @@
     };
 
     function doSpin(target, down) {
-        var spinner = $(target).spinner("options");
-        spinner.spin.call(target, down);
-        spinner[down ? "onSpinDown" : "onSpinUp"].call(target);
+        var opts = $(target).spinner("options");
+        opts.spin.call(target, down);
+        opts[down ? "onSpinDown" : "onSpinUp"].call(target);
         $(target).spinner("validate");
     };
     $.fn.spinner = function (options, param) {
@@ -116,24 +116,24 @@
         }
         options = options || {};
         return this.each(function () {
-            var spinner = $.data(this, "spinner");
-            if (spinner) {
-                $.extend(spinner.options, options);
+            var state = $.data(this, "spinner");
+            if (state) {
+                $.extend(state.options, options);
             } else {
-                spinner = $.data(this, "spinner", {options: $.extend({}, $.fn.spinner.defaults, $.fn.spinner.parseOptions(this), options)});
+                state = $.data(this, "spinner", {options: $.extend({}, $.fn.spinner.defaults, $.fn.spinner.parseOptions(this), options)});
             }
-            init(this);
+            buildSpinner(this);
         });
     };
     $.fn.spinner.methods = {
         options: function (jq) {
-            var tb = jq.textbox("options");
+            var opts = jq.textbox("options");
             return $.extend($.data(jq[0], "spinner").options, {
-                width: tb.width,
-                value: tb.value,
-                originalValue: tb.originalValue,
-                disabled: tb.disabled,
-                readonly: tb.readonly
+                width: opts.width,
+                value: opts.value,
+                originalValue: opts.originalValue,
+                disabled: opts.disabled,
+                readonly: opts.readonly
             });
         }
     };
@@ -144,7 +144,7 @@
         }]));
     };
     $.fn.spinner.defaults = $.extend({}, $.fn.textbox.defaults, {
-        min: null, max: null, increment: 1, spinAlign: "right", reversed: false, spin: function (param) {
+        min: null, max: null, increment: 1, spinAlign: "right", reversed: false, spin: function (down) {
         }, onSpinUp: function () {
         }, onSpinDown: function () {
         }
